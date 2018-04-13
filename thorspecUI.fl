@@ -1,0 +1,100 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0110 
+header_name {.h} 
+code_name {.cxx}
+Function {make_window()} {open
+} {
+  Fl_Window mainwin {
+    label Thorspec open selected
+    xywh {499 156 585 520} type Double box THIN_UP_BOX resizable visible
+  } {
+    Fl_Menu_Bar menubar {
+      xywh {0 0 770 25}
+    } {
+      Submenu {} {
+        label {&File} open
+        xywh {0 0 100 20}
+      } {
+        MenuItem {} {
+          label Save
+          xywh {0 0 100 20}
+        }
+        MenuItem {} {
+          label Load
+          xywh {5 5 100 20} divider
+        }
+        MenuItem {} {
+          label Print
+          xywh {0 0 100 20}
+        }
+        MenuItem {} {
+          label {Print x2}
+          xywh {0 0 100 20}
+        }
+        MenuItem {} {
+          label {Print preview}
+          xywh {0 0 37 21}
+        }
+        MenuItem {} {
+          label {Print x2 preview}
+          xywh {0 0 37 21} divider
+        }
+        MenuItem {} {
+          label Quit
+          xywh {0 0 37 21}
+        }
+      }
+      Submenu {} {
+        label Setup open
+        xywh {5 5 67 21}
+      } {
+        MenuItem {} {
+          label Calibration
+          xywh {0 0 37 21}
+        }
+      }
+      Submenu {} {
+        label {&Help} open
+        xywh {0 0 100 20}
+      } {
+        MenuItem menu_about {
+          label About
+          xywh {0 0 100 20}
+        }
+      }
+    }
+    Fl_Box canvas {
+      xywh {80 95 480 355} box THIN_DOWN_BOX color 55 align 1
+      class ZoomCanvas
+    }
+    Fl_Box xaxis {
+      label {Wavelength (nm)}
+      xywh {75 455 490 35} box FLAT_BOX align 2
+      class Ca_X_Axis
+    }
+    Fl_Box yaxis {
+      label Intensity
+      xywh {20 89 60 361} box FLAT_BOX align 137
+      class Ca_Y_Axis
+    }
+    Fl_Choice yrange {
+      label Range open
+      xywh {20 45 80 25} down_box BORDER_BOX align 1
+    } {}
+    Fl_Button autobut {
+      label {Auto scale}
+      xywh {10 460 50 40} align 128
+    }
+    Fl_Light_Button runbut {
+      label Run
+      xywh {465 45 95 25}
+    }
+    Fl_Value_Slider inttime {
+      label {Integration time (ms)}
+      xywh {215 49 180 21} type Horizontal align 1
+    }
+  }
+} 
+
+decl {from zoomcanvas import ZoomCanvas} {global
+} 

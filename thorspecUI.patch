@@ -1,0 +1,24 @@
+--- thorspecUI.py	2010-10-18 20:46:28.533596928 +0200
++++ thorspecUI.py.fixed	2010-10-18 20:47:14.456598324 +0200
+@@ -31,7 +31,7 @@
+     mainwin = Fl_Double_Window(386, 24, 590, 525, """XRD""")
+     menubar = Fl_Menu_Bar(0, 0, 770, 25)
+     menubar.copy( (
+-        ("&File", 0, 0, 0, 0), 
++        ("&File", 0, 0, 0, 64), 
+             ("Save", 0, 0, 0, 0), 
+             ("Load", 0, 0, 0, 128), 
+             ("Print", 0, 0, 0, 0), 
+@@ -40,10 +40,10 @@
+             ("Print x2 preview", 0, 0, 0, 128), 
+             ("Quit", 0, 0, 0, 0), 
+             (None, ),
+-        ("Setup", 0, 0, 0, 0), 
++        ("Setup", 0, 0, 0, 64), 
+             ("Calibration", 0, 0, 0, 0), 
+             (None, ),
+-        ("&Help", 0, 0, 0, 0), 
++        ("&Help", 0, 0, 0, 64), 
+             ("About", 0, 0, 0, 0), 
+             (None, ),
+         (None, ) ))

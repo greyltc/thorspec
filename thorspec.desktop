@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Thorspec
+Comment=Thor SPX fibre spectrometer
+Icon=thorspec
+Exec=thorspec
+Terminal=false
+Categories=Science;

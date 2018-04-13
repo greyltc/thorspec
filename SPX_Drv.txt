@@ -1,0 +1,1257 @@
+
+                    Thorlabs SPX-USB VISA Instrument Driver
+________________________________________________________________________________
+
+  Introduction:
+
+  This instrument driver provides programming support for Thorlabs SPX-USB VISA Instrument Driver.
+  It contains functions for opening, configuring, taking measurements from, and
+  closing the instrument.
+
+________________________________________________________________________________
+
+  Assumptions:
+
+  To successfully use this module, the following conditions must be met:
+
+  For GPIB instrument drivers:
+         -  the instrument is connected to the GPIB.
+         -  the GPIB address supplied to the initialize function must match the
+            GPIB address of the instrument.
+
+  For VXI instrument drivers:
+         -  the instrument is installed in the VXI mainframe and you are
+            using one of the following controller options:
+                  Embedded controller
+                  MXI
+                  MXI2
+                  GPIB-VXI
+         -  the logical address supplied to the initialize function must
+            match the logical address of the instrument.
+
+  For RS-232 instrument drivers:
+         -  the instrument is connected to the RS-232 interface.
+         -  the COM port, baud rate, parity, and timeout supplied to the
+            initialize function must match the settings of the instrument.
+
+________________________________________________________________________________
+
+  Error and Status Information:
+
+  Each function in this instrument driver returns a status code that
+  either indicates success or describes an error or warning condition.
+  Your program should examine the status code from each call to an
+  instrument driver function to determine if an error occurred.
+  The general meaning of the status code is as follows:
+
+       Value                  Meaning
+       -------------------------------
+       0                      Success
+       Positive Values        Warnings
+       Negative Values        Errors
+
+  The description of each instrument driver function lists possible error
+  codes and their meanings
+
+________________________________________________________________________________
+
+  How To Use This Document:
+
+  Use this document as a programming reference manual.
+  It describes each function in the
+
+                    Thorlabs SPX-USB VISA Instrument Driver
+
+  instrument.  The functions appear in alphabetical order, with a description
+  of the function and its C syntax, a description of each parameter, and a list
+  of possible error codes.
+
+________________________________________________________________________________
+
+Function Tree Layout:
+
+   Class/Panel Name:                           Function Name:
+
+      Initialize                               SPX_init
+      Configuration Functions
+         Set Integration Time                  SPX_setIntTime
+         Get Integration Time                  SPX_getIntTime
+      Action/Status Functions
+         Start Scan                            SPX_startScan
+         Start Ext Triggered Scan              SPX_startScanExtTrg
+         Start Scan Continuous                 SPX_startScanCont
+         Start Scan Continuous Ext. Trigger    SPX_startScanContExtTrg
+         Get Device Status                     SPX_getDeviceStatus
+      Data Functions
+         Get Scan Data                         SPX_getScanData
+         Get Raw Scan Data                     SPX_getRawScanData
+         Set User Wavelength Data              SPX_setUserWavelengthData
+         Get User Wavelength Data              SPX_getUserWavelengthData
+         Get Wavelength Data                   SPX_getWavelengthData
+         Get Wavelength Data Ext               SPX_getWavelengthDataExt
+      Utility Functions
+         Reset                                 SPX_reset
+         Error Message                         SPX_errorMessage
+         Identification Query                  SPX_identificationQuery
+         Revision Query                        SPX_revisionQuery
+         Set User Text                         SPX_setUserText
+         Get User Text                         SPX_getUserText
+      Close                                    SPX_close
+________________________________________________________________________________
+
+  Thorlabs SPX-USB VISA Instrument Driver
+
+      This instrument driver module provides programming support for  Thorlabs
+      SPX-USB spectrometers.
+      
+________________________________________________________________________________
+
+              The following functions are in alphabetical order.
+
+________________________________________________________________________________
+
+  SPX_close
+
+      ViStatus SPX_close (ViSession instrumentHandle);
+
+  Purpose
+
+      This function closes the instrument driver session and the VISA Resource
+      Manager session.
+      
+      Note: The instrument must be reinitialized to use it again.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_errorMessage
+
+      ViStatus SPX_errorMessage (ViSession instrumentHandle,
+                                 ViStatus statusCode,
+                                 ViChar _VI_FAR message[]);
+
+  Purpose
+
+      This function takes the Status Code returned by the instrument driver
+      functions, interprets it and returns it as a user readable string.
+      
+      Status Codes and Description:
+      
+      Status      Description
+      -------------------------------------------------
+               0  No error (the call was successful).
+      
+      --- Instrument Driver Warnings ---
+      0x3FFF0085  Unknown Status Code - VI_WARN_UNKNOWN_STATUS
+      0x3FFF0005  The specified termination character was read.
+      0x3FFF0006  The specified number of bytes was read.
+      
+      
+      --- Instrument Driver Errors ---
+      0xBFFC0001  Parameter 1 out of range.
+      0xBFFC0002  Parameter 2 out of range.
+      0xBFFC0003  Parameter 3 out of range.
+      0xBFFC0004  Parameter 4 out of range.
+      0xBFFC0005  Parameter 5 out of range.
+      0xBFFC0006  Parameter 6 out of range.
+      0xBFFC0007  Parameter 7 out of range.
+      0xBFFC0008  Parameter 8 out of range.
+      0xBFFC0011  Instrument returned invalid response to ID Query.
+      0xBFFC0803  Invalid response from instrument.
+      0x3FFC0804  No device connected to interface.
+      0xBFFC0805  Error querying Instrument Error Queue
+      
+      
+      --- Instrument Warnings ---
+      0x3FFC0901  A measurement overflow occured.
+      
+      
+      --- Instrument Errors ---
+      Range: 0xBFFC0900 .. 0xBFFC09FF.
+      Please see your instrument's documentation for details. The offset to
+      instrument error numbers is 0xBFFC0900.
+      
+      
+      --- VISA Errors ---
+      Please see your VISA library documentation for details.
+      
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+          Note: You may pass VI_NULL. If VI_NULL is passed to this parameter it
+          is not possible to get instrument specific error messages.
+          
+
+      statusCode
+
+          Variable Type       ViStatus
+
+          This parameter accepts the Status Code returned from the instrument
+          driver functions.
+          
+          Default Value: VI_SUCCESS (0)
+          
+
+      message
+
+          Variable Type       ViChar[]
+
+          This parameter returns the interpreted Status Code as a user readable
+          message string.
+          
+          Note:
+          The array must contain at least SPX_ERR_DESCR_BUFFER_SIZE (512)
+          elements (ViChar[SPX_ERR_DESCR_BUFFER_SIZE]).
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function help.
+          
+________________________________________________________________________________
+
+  SPX_getDeviceStatus
+
+      ViStatus SPX_getDeviceStatus (ViSession instrumentHandle,
+                                    ViPUInt8 deviceStatusByte);
+
+  Purpose
+
+      This function retrieves the status of the SPX. You can use this function
+      to detect if an external trigger has already occurred.
+      
+      valid return values are:
+      
+      SPX_SCAN_STATE_IDLE         0x00 LC waits for new scan
+      SPX_SCAN_STATE_TRANSFER     0x20 transferring data
+      SPX_SCAN_STATE_IN_PROGRES   0x40 scan is in progres
+      SPX_SCAN_STATE_WAIT_TRIGGER 0x80 external trigger is armed
+      
+      Note:
+      The values anove are defined in the drivers header file.
+      
+      
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      deviceStatusByte
+
+          Variable Type       ViUInt8 (passed by reference)
+
+          This parameter returns the instruments status byte.
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_getIntTime
+
+      ViStatus SPX_getIntTime (ViSession instrumentHandle,
+                               ViPReal64 integrationTime);
+
+  Purpose
+
+      This function queries the integration time.
+      
+      Note:
+      The value this function returns is (reverse) calculated from discrete
+      timer counter values of the SPX and may therfore slightly differ from the
+      value set with the function
+      'Set Interagtion Time'.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      integrationTime
+
+          Variable Type       ViReal64 (passed by reference)
+
+          This parameter returns the optical integration time in seconds [s].
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_getRawScanData
+
+      ViStatus SPX_getRawScanData (ViSession instrumentHandle,
+                                   ViInt16 _VI_FAR scanDataArray[]);
+
+  Purpose
+
+      This function gets data of one scan.
+      
+      Note:
+      In external triggered mode, when you issue this command before the SPX
+      was triggered you will get a timeout error.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      scanDataArray
+
+          Variable Type       ViInt16[]
+
+          This parameter returns the scanned data.
+          
+          
+          Note:
+          The array must contain at least SPX_NUM_PIXELS (3000) elements
+          (ViUInt16[SPX_NUM_PIXELS]).
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_getScanData
+
+      ViStatus SPX_getScanData (ViSession instrumentHandle,
+                                ViReal64 _VI_FAR scanDataArray[]);
+
+  Purpose
+
+      This function gets data of one scan.
+      
+      Note:
+      In external triggered mode, when you issue this command before the SPX
+      was triggered you will get a timeout error.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      scanDataArray
+
+          Variable Type       ViReal64[]
+
+          This parameter returns the scanned data.
+          
+          
+          Note:
+          The array must contain at least SPX_NUM_PIXELS (3000) elements
+          (ViReal64[SPX_NUM_PIXELS]).
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_getUserText
+
+      ViStatus SPX_getUserText (ViSession instrumentHandle,
+                                ViChar _VI_FAR userText[]);
+
+  Purpose
+
+      This function receives a user defined text stored in the nonvolatile
+      memory of the SPX.
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      userText
+
+          Variable Type       ViChar[]
+
+          This parameter returns a user defined string.
+          
+          Note:
+          The buffer must contain at least SPX_MAX_USER_NAME_SIZE (32) elements
+          (ViChar[SPX_MAX_USER_NAME_SIZE]).
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For status codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_getUserWavelengthData
+
+      ViStatus SPX_getUserWavelengthData (ViSession instrumentHandle,
+                                          ViInt32 _VI_FAR pixelDataArray[],
+                                          ViReal64 _VI_FAR wavelengthDataArray[],
+                                          ViInt32 _VI_FAR bufferLength[]);
+
+  Purpose
+
+      This function returns the user-defined pixel-wavelength correlation
+      supporting points. These given data pair arrays are used by the driver to
+      interpolate the pixel-wavelength correlation array returned by the
+      SPX_getWavelengthData function.
+      
+      Note:
+      If you do not need either of these values you may pass NULL.
+      The function returns with error VI_ERROR_NO_USER_DATA if no user
+      calibration data is present in the instruments nonvolatile memory.
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      pixelDataArray
+
+          Variable Type       ViInt32[]
+
+          This parameter will receive the pixel values of the user-defined
+          pixel/wavelength data pairs.
+          
+          
+          Note:
+          The array must contain SPX_MAX_NUM_USR_ADJ (10) elements.
+          You may pass NULL.
+
+      wavelengthDataArray
+
+          Variable Type       ViReal64[]
+
+          This parameter will receive the wavelength values of the user-defined
+          pixel/wavelength data pairs.
+          
+          
+          Note:
+          The array must contain SPX_MAX_NUM_USR_ADJ (10) elements.
+          You may pass NULL.
+
+      bufferLength
+
+          Variable Type       ViInt32[]
+
+          This parameter receives the number of elements in the Pixel Data
+          Array and the Wavelength Data Array.
+          
+          Note:
+          You may pass NULL. In case no user calibration data is present the
+          parameter will be set to 0.
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_getWavelengthData
+
+      ViStatus SPX_getWavelengthData (ViSession instrumentHandle,
+                                      ViReal64 _VI_FAR wavelengthDataArray[],
+                                      ViPReal64 minimumWavelength,
+                                      ViPReal64 maximumWavelength);
+
+  Purpose
+
+      This function gets data for the pixel-wavelength correlation from the
+      factory calibration data set.
+      The maximum and the minimum wavelength are additionally provided in two
+      separate return values.
+      
+      Note:
+      If you do not need either of these values you may pass NULL.
+      
+      The value returned in Wavelength_Data_Array[0] is the wavelength at pixel
+      0, this is also the minimum wavelength, the value returned in
+      Wavelength_Data_Array[1] is the wavelength at pixel 1 and so on until
+      Wavelength_Data_Array[SPX_NUM_PIXELS-1] which provides the wavelength at
+      pixel SPX_NUM_PIXELS-1 (2999). This is the maximum wavelength.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      wavelengthDataArray
+
+          Variable Type       ViReal64[]
+
+          This parameter returns the wavelength data.
+          
+          
+          Note:
+          The array must contain at least SPX_NUM_PIXELS (3000) elements
+          (ViReal64[SPX_NUM_PIXELS]). If you do not need the array you may pass
+          NULL for this parameter.
+          
+
+      minimumWavelength
+
+          Variable Type       ViReal64 (passed by reference)
+
+          This parameter returns the minimum wavelength in nanometers (nm). It
+          is the same value as returned in Wavelength Data Array position 0.
+          
+          
+          Note:
+          You mas pass NULL for this parameter..
+          
+
+      maximumWavelength
+
+          Variable Type       ViReal64 (passed by reference)
+
+          This parameter returns the maximum wavelength in nanometers (nm). It
+          is the same value as returned in Wavelength Data Array position
+          SPX_NUM_PIXELS - 1 (2999).
+          
+          
+          Note:
+          You mas pass NULL for this parameter..
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_getWavelengthDataExt
+
+      ViStatus SPX_getWavelengthDataExt (ViSession instrumentHandle,
+                                         ViUInt8 dataSet,
+                                         ViReal64 _VI_FAR wavelengthDataArray[],
+                                         ViPReal64 minimumWavelength,
+                                         ViPReal64 maximumWavelength);
+
+  Purpose
+
+      This function returns data for the pixel-wavelength correlation.
+      The maximum and the minimum wavelength are additionally provided in two
+      separate return values.
+      
+      Note:
+      If you do not need either of these values you may pass NULL.
+      
+      
+      The value returned in Wavelength_Data_Array[0] is the wavelength at pixel
+      0, this is also the minimum wavelength, the value returned in
+      Wavelength_Data_Array[1] is the wavelength at pixel 1 and so on until
+      Wavelength_Data_Array[SPX_NUM_PIXELS-1] which provides the wavelength at
+      pixel SPX_NUM_PIXELS-1 (2999). This is the maximum wavelength.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      dataSet
+
+          Variable Type       ViUInt8
+
+          This parameter specifies which calibration data set has to be used
+          for generating the wavelength data array.
+          
+          Values:
+          SPX_CAL_DATA_SET_FACTORY (0) - Use factory adjustment data to
+          generate the wavelength data array.
+          
+          SPX_CAL_DATA_SET_USER (1) - Use user-defined adjustment data to
+          generate the wavelength data array. (see also function
+          SPX_setUserWavelengthData)
+
+      wavelengthDataArray
+
+          Variable Type       ViReal64[]
+
+          This parameter returns the wavelength data.
+          
+          
+          Note:
+          The array must contain at least SPX_NUM_PIXELS (3000) elements
+          (ViReal64[SPX_NUM_PIXELS]). If you do not need the array you may pass
+          NULL for this parameter.
+          
+
+      minimumWavelength
+
+          Variable Type       ViReal64 (passed by reference)
+
+          This parameter returns the minimum wavelength in nanometers (nm). It
+          is the same value as returned in Wavelength Data Array position 0.
+          
+          
+          Note:
+          You mas pass NULL for this parameter..
+          
+
+      maximumWavelength
+
+          Variable Type       ViReal64 (passed by reference)
+
+          This parameter returns the maximum wavelength in nanometers (nm). It
+          is the same value as returned in Wavelength Data Array position
+          SPX_NUM_PIXELS - 1 (2999).
+          
+          
+          Note:
+          You mas pass NULL for this parameter..
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_identificationQuery
+
+      ViStatus SPX_identificationQuery (ViSession instrumentHandle,
+                                        ViChar _VI_FAR manufacturerName[],
+                                        ViChar _VI_FAR instrumentName[],
+                                        ViChar _VI_FAR instrumentSerialNumber[],
+                                        ViChar _VI_FAR firmwareRevision[]);
+
+  Purpose
+
+      This function returns the instrument identification.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      manufacturerName
+
+          Variable Type       ViChar[]
+
+          This parameter returns the manufacturer name.
+          
+          Note: The array must contain at least SPX_TEXT_BUFFER_SIZE (256)
+          elements (ViChar[SPX_TEXT_BUFFER_SIZE]).
+          
+          Note: You may pass VI_NULL.
+          
+
+      instrumentName
+
+          Variable Type       ViChar[]
+
+          This parameter returns the instrument name.
+          
+          Note: The array must contain at least SPX_TEXT_BUFFER_SIZE (256)
+          elements (ViChar[SPX_TEXT_BUFFER_SIZE]).
+          
+          Note: You may pass VI_NULL.
+          
+
+      instrumentSerialNumber
+
+          Variable Type       ViChar[]
+
+          This parameter returns the instrument serial number.
+          
+          Note: The array must contain at least SPX_TEXT_BUFFER_SIZE (256)
+          elements (ViChar[SPX_TEXT_BUFFER_SIZE]).
+          
+          Note: You may pass VI_NULL.
+          
+
+      firmwareRevision
+
+          Variable Type       ViChar[]
+
+          This parameter returns the instrument firmware revision.
+          
+          Note: The array must contain at least SPX_TEXT_BUFFER_SIZE (256)
+          elements (ViChar[SPX_TEXT_BUFFER_SIZE]).
+          
+          Note: You may pass VI_NULL.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_init
+
+      ViStatus SPX_init (ViRsrc resourceName, ViInt32 timeout,
+                         ViPSession instrumentHandle);
+
+  Purpose
+
+      This function performs the following initialization actions:
+      
+      - Opens a session to the Default Resource Manager resource and a session
+      to the specified device using the interface and address passed to the
+      <Resource Name> parameter.
+      
+      - Performs an identification query on the instrument.
+      
+      - Resets the instrument to a known state.
+      
+      - Sends initialization commands to the instrument.
+      
+      - Returns an Instrument Handle which is used to differentiate between
+      different sessions of this instrument driver.
+      
+      - Each time this function is invoked a Unique Session is opened.  It is
+      possible to have more than one session open for the same resource. To
+      lock the resource use the VISA library <viLock> function.
+      
+
+  Parameter List
+
+      resourceName
+
+          Variable Type       ViRsrc
+
+          This parameter specifies the interface of the device that is to be
+          initialized. The exact grammar to be used in this control is shown in
+          the note below. The USB keyword is used for USB  instruments.
+          
+          Default Value:  "USB::INSTR"
+          USB0::0x1313::0x0111::NI-VISA-0::RAW
+          USB RAW         USB[board]::vendor id::product id
+                          ::serial number[::interface number]::RAW
+          Notes:
+          
+          Based on the resource name, this operation establishes a
+          communication session with a device. The grammar for the resource
+          name is shown below. Optional parameters are shown in square brackets
+          ([]).
+          
+          Interface       Grammar
+          ----------------------------------------------------------------
+          USB             USB[board]::vendor id::product id
+                          ::serial number[::interface number]::RAW
+          Remote Access   visa://hostname[:visaport]/USB[board]::vendor id
+                          ::product id::serial number
+                          [::interface number]::RAW
+          
+          
+          Example Resource Strings:
+          ----------------------------------------------------------------
+          USB0::0x1313::0x0111::NI-VISA-0::RAW
+                          A SP1 connected to a local USB port.
+          
+          visa://192.168.3.44/USB0::0x1313::0x0111::NI-VISA-0::RAW
+                          Remote access to a SP1 connected to a USB
+                          port on the host (PC) with the specified IP
+                          address.
+          
+
+      timeout
+
+          Variable Type       ViInt32
+
+          This parameter specifies the communication timeout value in
+          milliseconds.
+          
+          Valid range:   1000 .. 60000
+          Default value: 3000
+          
+
+      instrumentHandle
+
+          Variable Type       ViSession (passed by reference)
+
+          This parameter returns an Instrument Handle that is used in all
+          subsequent function calls to differentiate between different sessions
+          of this instrument driver.
+          
+          Note: Each time this function is invoked a Unique Session is opened.
+          It is possible to have more than one session open for the same
+          resource.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_reset
+
+      ViStatus SPX_reset (ViSession instrumentHandle);
+
+  Purpose
+
+      This function resets the instrument.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_revisionQuery
+
+      ViStatus SPX_revisionQuery (ViSession instrumentHandle,
+                                  ViChar _VI_FAR instrumentDriverRevision[],
+                                  ViChar _VI_FAR firmwareRevision[]);
+
+  Purpose
+
+      This function queriess the revision numbers of the instrument driver and
+      the instrument firmware.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+          Note: You may pass VI_NULL. In this case it is not possible to query
+          the Firmware Revision.
+          
+
+      instrumentDriverRevision
+
+          Variable Type       ViChar[]
+
+          This parameter returns the instrument driver software revision.
+          
+          Note: The array must contain at least SPX_TEXT_BUFFER_SIZE (256)
+          elements (ViChar[SPX_TEXT_BUFFER_SIZE]).
+          
+          Note: You may pass VI_NULL.
+          
+          
+
+      firmwareRevision
+
+          Variable Type       ViChar[]
+
+          This parameter returns the instrument firmware revision.
+          
+          Note: The array must contain at least SPX_TEXT_BUFFER_SIZE (256)
+          elements (ViChar[SPX_TEXT_BUFFER_SIZE]).
+          
+          Note: You may pass VI_NULL.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_setIntTime
+
+      ViStatus SPX_setIntTime (ViSession instrumentHandle,
+                               ViReal64 integrationTime);
+
+  Purpose
+
+      This function sets the optical integration time.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      integrationTime
+
+          Variable Type       ViReal64
+
+          This parameter accepts the optical integration time for the SPX in
+          seconds [s].
+          
+          Valid range:   SPX_MIN_INT_TIME (1.0E-6) ...
+                         SPX_MAX_INT_TIME (200.0E-3)
+          Default value: 1.0E-3.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_setUserText
+
+      ViStatus SPX_setUserText (ViSession instrumentHandle,
+                                ViChar _VI_FAR userText[]);
+
+  Purpose
+
+      This function transfers a user definable text and saves it in the
+      nonvolatile memory of the SPX.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      userText
+
+          Variable Type       ViChar[]
+
+          This parameter specifies a user definable string.
+          
+          Note:
+          The string will be truncated to SPX_MAX_USER_NAME_SIZE-1 (31)
+          characters. The number of characters stored in the SPX is always
+          SPX_MAX_USER_NAME_SIZE (32), the last character stored is always the
+          NUL character.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For status codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_setUserWavelengthData
+
+      ViStatus SPX_setUserWavelengthData (ViSession instrumentHandle,
+                                          ViInt32 _VI_FAR pixelDataArray[],
+                                          ViReal64 _VI_FAR wavelengthDataArray[],
+                                          ViInt32 bufferLength);
+
+  Purpose
+
+      This function stores data for user-defined pixel-wavelength correlation
+      to the instruments nonvolatile memory.
+      
+      The given data pair arrays are used to interpolate the pixel-wavelength
+      correlation array returned by the SPX_getWavelengthData function.
+      
+      Note: In case the interpolated pixel-wavelength correlation contains
+      negative values, or the values are not strictly increasing the function
+      returns with error VI_ERROR_INV_USER_DATA.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+      pixelDataArray
+
+          Variable Type       ViInt32[]
+
+          This parameter accepts the pixel values of the pixel/wavelength data
+          pairs. The valid range for pixel values is from 0 up to SPX_NUM_PIXEL
+          (3000) - 1.
+          
+          
+          Note:
+          The array must contain at least four elements and at most
+          SPX_MAX_NUM_USR_ADJ (10) elements.
+          
+          
+
+      wavelengthDataArray
+
+          Variable Type       ViReal64[]
+
+          This parameter accepts the wavelength values of the pixel/wavelength
+          data pairs in nm. The wavelength value has to be positive.
+          
+          
+          Note:
+          The array must contain at least four elements and at most
+          SPX_MAX_NUM_USR_ADJ (10) elements.
+          
+
+      bufferLength
+
+          Variable Type       ViInt32
+
+          This parameter accepts the number of elements in the Pixel Data Array
+          and the Wavelength Data Array.
+          
+          Note:
+          The arrays must contain at least four elements and at most
+          SPX_MAX_NUM_USR_ADJ (10) elements.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_startScan
+
+      ViStatus SPX_startScan (ViSession instrumentHandle);
+
+  Purpose
+
+      This function starts a scan of the SPX.
+      
+      Note:
+      The scan data can be read out with the function
+      'Get Scan Data'
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_startScanCont
+
+      ViStatus SPX_startScanCont (ViSession instrumentHandle);
+
+  Purpose
+
+      This function starts the SPX scanning continuously. Any other function
+      except 'Get Scan Data' will stop the scanning.
+      
+      Note:
+      The scan data can be read out with the function
+      'Get Scan Data'
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_startScanContExtTrg
+
+      ViStatus SPX_startScanContExtTrg (ViSession instrumentHandle);
+
+  Purpose
+
+      This function arms the SPX for scanning after an external trigger. A
+      following low to high transition at the trigger input of the SPX then
+      starts a scan. The SPX will rearm immediately after the scan data is
+      readout. Any other function except 'Get Scan Data' will stop the
+      scanning.
+      
+      Note:
+      The scan data can be read out with the function
+      'Get Scan Data'
+      
+      
+      Note:
+      When you issue a read command "SPX_getScanData ();" before the SPX was
+      triggered you will get a timeout error.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+________________________________________________________________________________
+
+  SPX_startScanExtTrg
+
+      ViStatus SPX_startScanExtTrg (ViSession instrumentHandle);
+
+  Purpose
+
+      This function arms the external trigger of the SPX. A following low to
+      high transition at the trigger input of the SPX then starts a scan.
+      
+      Note:
+      When you issue a read command "SPX_getScanData ();" before the SPX was
+      triggered you will get a timeout error.
+      
+
+  Parameter List
+
+      instrumentHandle
+
+          Variable Type       ViSession
+
+          This parameter accepts the Instrument Handle returned by the
+          Initialize function to select the desired instrument driver session.
+          
+
+  Return Value
+
+          This value shows the status code returned by the function call.
+          
+          For Status Codes see function <Error Message>.
+          
+
