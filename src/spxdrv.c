@@ -306,6 +306,8 @@ ViStatus _VI_FUNC SPX_init (ViRsrc resource, ViInt32 timeout, ViPSession pInstr)
 				{
 					"SP1",
 					"SP2",
+					"CCS100",
+					"CCS175",
 					"SP1-USB",
 					"SP2-USB",
 					"SP1-USB Spectrometer         FW ver 1.30",

@@ -31,12 +31,14 @@ void status(unsigned long inst) {
 int main(int argc, char* argv[]) {
     unsigned long inst; //instrument handle  (ViPSession = unsigned long*)
     ViStatus ret;
- 
+
+    ret = CCSseries_init(argv[1],   VI_ON,  VI_ON,      &inst); // read usb vid:pid from command line
     //                   resource name, IDQuery, resetDevice, instrumentHandle
-    ret = CCSseries_init("1313:8081",   VI_OFF,  VI_OFF,      &inst);
+    //ret = CCSseries_init("1313:8081",   VI_OFF,  VI_OFF,      &inst);
+    //ret = CCSseries_init("1313:8087",   VI_ON,  VI_ON,      &inst);
     //ret = CCSseries_init("1313:8081",   VI_ON,  VI_ON,      &inst);
     showerr(inst, ret, "init");   // if nonzero must exit, as we'll get a segfault if we proceed
-    
+
     char vendor[CCS_SERIES_BUFFER_SIZE];
     char device[CCS_SERIES_BUFFER_SIZE];
     char serial[CCS_SERIES_BUFFER_SIZE];
@@ -51,30 +53,30 @@ int main(int argc, char* argv[]) {
     ret = CCSseries_getIntegrationTime(inst, &inttime);
     showerr(inst, ret, "getinttime");
     printf("inttime read as %f\n", inttime);
-    
+
     printf("inttime?\n");
     scanf("%lf", &newinttime);
     ret = CCSseries_setIntegrationTime(inst, newinttime);
     showerr(inst, ret, "setinttime");
-    
+
     ret = CCSseries_getIntegrationTime(inst, &inttime);
     showerr(inst, ret, "get2inttime");
     printf("inttime read as %f after setting %f\n", inttime, newinttime);
     status(inst);
-    
-    
+
+
     double wavdata[CCS_SERIES_NUM_PIXELS];
     double minimumWavelength, maximumWavelength;
     ret = CCSseries_getWavelengthData(inst, CCS_SERIES_CAL_DATA_SET_FACTORY, wavdata, &minimumWavelength, &maximumWavelength);
     showerr(inst, ret, "getwldata");
     status(inst);
-    
+
     printf("wavelengths %lf to %lf\n", minimumWavelength, maximumWavelength);
     printf("%lf, %lf,... %lf, %lf\n", wavdata[0], wavdata[1], wavdata[CCS_SERIES_NUM_PIXELS-2],wavdata[CCS_SERIES_NUM_PIXELS-1]);
-    
+
     CCSseries_startScan(inst);
     //sleep(2);    will time out after 3 s so long integs need something here
-    
+
     double ampdata[CCS_SERIES_NUM_PIXELS];
     ret = CCSseries_getScanData(inst, ampdata);
     showerr(inst, ret, "getampdata");
@@ -88,13 +90,13 @@ int main(int argc, char* argv[]) {
     }
     fclose(outfil);
     system("echo \"plot '/tmp/spec' with lines\" | gnuplot -persist -");
-    
-    
+
+
     /// TODO a flush read before starting?
-    
+
     ret = CCSseries_close(inst);
     showerr(inst, ret, "close");
-    
+
     return 0;
 }
- 
+
